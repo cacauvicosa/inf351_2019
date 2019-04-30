@@ -91,6 +91,7 @@ void seed_apple() {
 		if(apple_x == snake[i][0] && apple_y == snake[i][1]) {
 			apple_x = random(ROWS);
 			apple_y = random(COLS);
+			i = 0;
 		}
 	}
 	strip.setPixelColor(map_px(apple_x, apple_y), apple_color);
@@ -128,14 +129,6 @@ void move_snake(char c) {
 			
 	}
 	
-	strip.setPixelColor(map_px(snake_x, snake_y), snake_color);
-	
-	if(snake_x == apple_x && snake_y == apple_y) {
-		++growing;
-		seed_apple();
-		++snake_size;
-	}
-	
 	if(!growing) strip.setPixelColor(map_px(snake[snake_size-1][0], snake[snake_size-1][1]), 0);
 	else --growing;
 	
@@ -147,6 +140,14 @@ void move_snake(char c) {
 	
 	snake[0][0] = snake_x;
 	snake[0][1] = snake_y;
+	
+	strip.setPixelColor(map_px(snake_x, snake_y), snake_color);
+	
+	if(snake_x == apple_x && snake_y == apple_y) {
+		++growing;
+		++snake_size;
+		seed_apple();
+	}
 }
 
 void loop () {
