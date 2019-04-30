@@ -1,11 +1,18 @@
+#include "snakefx.cpp"
 
 char dir = 's';
 char last_dir = 's';
 
-#include "snakefx.cpp"
-
+#define LED_PIN 1
 #define ROWS 12
 #define COLS 12
+#define LED_COUNT 144
+
+#define UP	7
+#define DOWN	6
+#define LEFT	5
+#define RIGHT	4
+#define INTERRUPT 2
 
 int map_px ( int l, int c ) {
 	return l *  COLS + ((l % 2)?COLS-c-1:c);
@@ -29,12 +36,24 @@ uint32_t death_color = 0x0000FF;
 
 #define MAX_SNAKE_SIZE 500
 int snake[MAX_SNAKE_SIZE][2] = { 0 };
-//int board[ROWS][COLS] = { 0 };
+
+volatile int button_pressed = 0;
+
+void set_button_pressed(void) {
+	button_pressed = 1;
+}
 
 void setup () {
 	
-	MAT_COLS = COLS; // width
-	MAT_LINES = ROWS; // height
+	strip.set_num_cols(COLS);
+
+	pinMode(UP, INPUT);
+	pinMode(DOWN, INPUT);
+	pinMode(LEFT, INPUT);
+	pinMode(RIGHT, INPUT);
+	pinMode(INTERRUPT, INPUT_PULLUP);
+	
+	attachInterrupt(digitalPinToInterrupt(INTERRUPT), set_button_pressed, RISING);
 
 	randomSeed(analogRead(0));
 	
@@ -66,8 +85,7 @@ void reset_game() {
 	dir = 's';
 	last_dir = 's';
 	
-	snake_x = ROWS / 2;
-	snake_y = COLS / 2;
+	snake_x = ROWS / 2;	snake_y = COLS / 2;
 	snake_size = 3;
 	growing = 2;
 	
@@ -101,6 +119,23 @@ void seed_apple() {
 		}
 	}
 	strip.setPixelColor(map_px(apple_x, apple_y), apple_color);
+}
+
+
+void change_direction() {
+	
+	//Debounce time
+	delay(0);
+	if(digitalRead(UP) == HIGH) {
+		dir = 'u';
+	} else if (digitalRead(DOWN) == HIGH) {
+		dir = 'd';
+	} else if (digitalRead(LEFT) == HIGH) {
+		dir = 'l';
+	} else if (digitalRead(RIGHT) == HIGH) {
+		dir = 'r';
+	}
+	button_pressed = 0;
 }
 
 void move_snake(char c) {
@@ -160,6 +195,7 @@ void move_snake(char c) {
 }
 
 void loop () {
+	if(button_pressed) change_direction();
 	if(dir != 's') move_snake(dir);
 	strip.show();
 	delay(100 - snake_size / 5);
