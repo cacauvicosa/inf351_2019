@@ -21,9 +21,11 @@ int snake_size = 3;
 
 int apple_x;
 int apple_y;
+int new_seed = 0;
 
 uint32_t apple_color = 0xFF0000;
 uint32_t snake_color = 0x00FF00;
+uint32_t death_color = 0x0000FF;
 
 #define MAX_SNAKE_SIZE 500
 int snake[MAX_SNAKE_SIZE][2] = { 0 };
@@ -56,6 +58,9 @@ void setup () {
 
 void reset_game() {
 	
+	strip.setPixelColor(map_px(snake_x, snake_y), death_color);
+	strip.show();
+	
 	delay(1000);
 	
 	dir = 's';
@@ -68,6 +73,7 @@ void reset_game() {
 	
 	apple_x = random(ROWS);
 	apple_y = random(COLS);
+	new_seed = 0;
 	if(apple_x == snake_x) while(apple_y == snake_y) apple_y = random(COLS);
 	
 	for(int i = 0; i < snake_size; i++) {
@@ -132,26 +138,29 @@ void move_snake(char c) {
 	if(!growing) strip.setPixelColor(map_px(snake[snake_size-1][0], snake[snake_size-1][1]), 0);
 	else --growing;
 	
+	if(snake_x == apple_x && snake_y == apple_y) {
+		++growing;
+		++snake_size;
+		new_seed = 1;
+	}
+	
 	for(int i = snake_size - 1; i > 0; i--) { 
-		if(snake_x == snake[i][0] && snake_y == snake[i][1]) { reset_game(); return; }
 		snake[i][0] = snake[i-1][0];
 		snake[i][1] = snake[i-1][1];
+		if(snake_x == snake[i][0] && snake_y == snake[i][1]) { reset_game(); return; }
 	}
 	
 	snake[0][0] = snake_x;
 	snake[0][1] = snake_y;
 	
-	strip.setPixelColor(map_px(snake_x, snake_y), snake_color);
 	
-	if(snake_x == apple_x && snake_y == apple_y) {
-		++growing;
-		++snake_size;
-		seed_apple();
-	}
+	if(new_seed) { seed_apple(); new_seed = 0; }
+	
+	strip.setPixelColor(map_px(snake_x, snake_y), snake_color);
 }
 
 void loop () {
 	if(dir != 's') move_snake(dir);
 	strip.show();
-	delay(100);
+	delay(100 - snake_size / 5);
 }
