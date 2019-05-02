@@ -5,9 +5,6 @@
 #include <unistd.h>
 #include <GL/glut.h>
 #include <GL/freeglut.h>
-#include <iostream>
-#include <vector>
-#include <map>
 
 #define M_MAX 300
 
@@ -106,33 +103,36 @@ void * fx_loop (void *p) {
 #define LOW 0
 #define HIGH 1
 
-int keys[255] = { 0 };
-std::map<char, std::vector<int>> keys_to_pins;
+int keys_fx[255] = { 0 };
+int n_pins_fx[255] = { 0 };
+int keys_to_pins_fx[255][500];
 
-void *interrupt_func[255] = { NULL };
+int interrupt_pins_fx[500];
+int n_interrupt_pins_fx;
 
-int digitalRead(int c) { return keys[c] > 0; }
-void digitalWrite(int c, int VAL) { if(VAL) ++keys[c]; else keys[c] = LOW; }
+void *rising_interrupt_func_fx[255] = { NULL };
+
+int digitalRead(int c) { return keys_fx[c] > 0; }
+void digitalWrite(int c, int VAL) { if(VAL) ++keys_fx[c]; else keys_fx[c] = LOW; }
 
 void key_handler( unsigned char c, int x, int y ) {
-	unsigned long i;
-	std::vector<int> pins_to_set = keys_to_pins[c];
-	std::vector<int> pins_to_interrupt;
-	for(i = 0; i < pins_to_set.size(); i++) {
-		if(interrupt_func[pins_to_set[i]] != NULL && keys[pins_to_set[i]] == 0) pins_to_interrupt.push_back(pins_to_set[i]);
-		++keys[pins_to_set[i]];
+	int i;
+	
+	n_interrupt_pins_fx = 0;
+	for(i = 0; i < n_pins_fx[c]; i++) {
+		if(rising_interrupt_func_fx[keys_to_pins_fx[c][i]] != NULL && keys_fx[keys_to_pins_fx[c][i]] == 0) { interrupt_pins_fx[n_interrupt_pins_fx++] = keys_to_pins_fx[c][i]; }
+		++keys_fx[keys_to_pins_fx[c][i]];
 	}
 	
-	for(i = 0; i < pins_to_interrupt.size(); i++) {
-		(*((void (*)(void))interrupt_func[pins_to_interrupt[i]]))();
+	for(i = 0; i < n_interrupt_pins_fx; i++) {
+		(*((void (*)(void))rising_interrupt_func_fx[interrupt_pins_fx[i]]))();
 	}
 	
 }
 
 void up_key_handler( unsigned char c, int x, int y) {
-	std::vector<int> pins_to_set = keys_to_pins[c];
-	for(unsigned long i = 0; i < pins_to_set.size(); i++) {
-		--keys[pins_to_set[i]];
+	for(int i = 0; i < n_pins_fx[c]; i++) {
+		--keys_fx[keys_to_pins_fx[c][i]];
 	}
 }
 
@@ -148,14 +148,14 @@ int digitalPinToInterrupt(int pin) { return pin; }
 #define FALLING 0
 #define CHANGE 0
 void attachInterrupt(int pin, void (*callback) (void), int mode) {
-	interrupt_func[pin] = (void *) callback;
+	rising_interrupt_func_fx[pin] = (void *) callback;
 }
 
 void init_pins() {
 	FILE *f;
 	f = fopen("digital_input.config", "r");
 	char line[200];
-	char key;
+	unsigned char key;
 	int pin;
 	
 	if(f == NULL) {
@@ -170,15 +170,17 @@ void init_pins() {
 		read_offset = bytes_read;
 		while(sscanf(line + read_offset, "%d%n", &pin, &bytes_read) == 1) {
 			read_offset += bytes_read;
-			keys_to_pins[key].push_back(pin);
+			keys_to_pins_fx[key][n_pins_fx[key]++] = pin;
 		}
 	}
 	
-	for(std::map<char, std::vector<int>>::iterator it = keys_to_pins.begin(); it != keys_to_pins.end(); it++) {
-		std::cout << it->first << " ->";
-		for(unsigned long i = 0; i < it->second.size(); i++) {
-			std::cout << " " << it->second[i];
-		} std::cout << std::endl;
+	for(int i = 0; i < 255; i++) {
+		if(n_pins_fx[i]) {
+			printf("%c ->", i);
+			for(int j = 0; j < n_pins_fx[i]; j++)
+				printf(" %d", keys_to_pins_fx[i][j]);
+			printf("\n");
+		}
 	}
 }
 
