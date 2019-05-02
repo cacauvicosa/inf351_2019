@@ -15,7 +15,7 @@ Adafruit_NeoPixel strip(LED_COUNT, LED_PIN, NEO_GRB + NEO_KHZ800);
 
 void setup () {
 	
-	strip.set_num_cols(COLS); // Apenas no simulador, comentar para Arduino
+	set_num_cols(COLS); // Apenas no simulador, comentar para Arduino
 
 	strip.begin();
 

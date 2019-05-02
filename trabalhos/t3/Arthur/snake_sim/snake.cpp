@@ -1,4 +1,4 @@
-#include "snakefx.cpp"
+#include "fx.cpp"
 
 char dir = 's';
 char last_dir = 's';
@@ -44,8 +44,6 @@ void set_button_pressed(void) {
 }
 
 void setup () {
-	
-	strip.set_num_cols(COLS);
 
 	pinMode(UP, INPUT);
 	pinMode(DOWN, INPUT);
