@@ -1,4 +1,4 @@
-snake : snakefx.cpp snake.cpp
-	g++ snake.cpp -o snake -lGLU -lglut -lGL -lpthread
+snake : snakefx.cpp letras.cpp
+	g++ letras.cpp -o letras -lGLU -lglut -lGL -lpthread
 	
 

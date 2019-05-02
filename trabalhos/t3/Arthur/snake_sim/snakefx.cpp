@@ -329,7 +329,7 @@ void key_handler( unsigned char c, int x, int y ) {
 		keys[6] = HIGH;
 		break;
 	}
-	button_pressed = 1;
+	//button_pressed = 1;  // Comentado caso nao use teclado com entrada
 }
 
 void up_key_handler( unsigned char c, int x, int y) {
@@ -551,12 +551,18 @@ int random(int n) { return rand() % n; }
 #define NEO_RGB 0
 #define NEO_RGBW 0
 
+void set_num_cols(int cols) { MAT_COLS_FX = cols; MAT_LINES_FX = LED_COUNT_FX / cols; }
+		
 class Adafruit_NeoPixel { 
 
 	public :
 	
 		Adafruit_NeoPixel(int led_count, int led_pin, int garbage) {
 			LED_COUNT_FX = led_count;
+		}
+
+		Adafruit_NeoPixel() {
+			LED_COUNT_FX = 144;
 		}
 	
 		void begin() { }
@@ -576,7 +582,6 @@ class Adafruit_NeoPixel {
 		
 		}
 		
-		void set_num_cols(int cols) { MAT_COLS_FX = cols; MAT_LINES_FX = LED_COUNT_FX / cols; }
 		
 		void setPixelColor( int n, int color ) { 
 		
