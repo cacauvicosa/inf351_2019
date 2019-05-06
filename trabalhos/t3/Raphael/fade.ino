@@ -83,7 +83,10 @@ void loop() {
       set_pixel(x, y, 255 - color, color, 0);
     }
 
-  unsigned char r = get_at(buf, 0, 0, COLS, ROWS);
+  unsigned char r = distance(0, 0, CX, CY) == reference
+                        ? get_at(buf, 0, 0, COLS, ROWS)
+                        : get_at(buf, COLS - 1, ROWS - 1, COLS, ROWS);
+
   if (r == 255 || r == 0)
     increase ^= true;
 
