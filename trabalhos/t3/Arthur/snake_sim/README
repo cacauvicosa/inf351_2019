@@ -1,0 +1,16 @@
+fx.cpp   		- Gerencia o grid e a thread de efeitos	
+digital_input.config 	- Permite abstrair caracteres do teclado como pinos de entrada do arduino
+comp.sh 		- Para facilitar a compilação dos projetos, argumentos: nome do arquivo e opcional nome do executável
+
+Devem ser implementadas as funções void loop() e void setup() e incluir o arquivo fx.cpp
+
+Para informar o número correto de linhas ou colunas, fazer a chamada de uma das funções
+set_num_cols( cols )
+set_num_lines( lines )
+set_grid_dims( lines, cols )
+
+Se não algoritmo tenta criar grid MxN ( M*N == LED_COUNT ) que minimiza |M - N|
+
+Dependências: 
+
+	freeglut3-dev

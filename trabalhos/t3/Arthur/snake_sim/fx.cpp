@@ -247,10 +247,26 @@ class Adafruit_NeoPixel {
 
 	public :
 	
-		Adafruit_NeoPixel() { LED_COUNT_FX = 144; }
+		Adafruit_NeoPixel() { LED_COUNT_FX = 144; MAT_LINES_FX = 12; MAT_COLS_FX = 12;}
 	
 		Adafruit_NeoPixel(int led_count, int led_pin, int garbage) {
+			int t_lines;
+			int t_cols;
+			int closest = 0x7FFFFFFF;
+			MAT_LINES_FX = 12;
+			MAT_COLS_FX = 12;
+			
 			LED_COUNT_FX = led_count;
+			
+			for(t_lines = 1; t_lines < LED_COUNT_FX; t_lines++) {
+				if(led_count % t_lines) continue;
+				t_cols = led_count / t_lines;
+				if(abs(t_lines - t_cols) < closest) {
+					MAT_LINES_FX = t_lines;
+					MAT_COLS_FX = t_cols;
+					closest = abs(t_lines - t_cols);
+				}
+			}
 		}
 	
 		Adafruit_NeoPixel(const Adafruit_NeoPixel &p) {

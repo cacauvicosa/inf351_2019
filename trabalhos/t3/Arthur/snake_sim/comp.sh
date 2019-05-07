@@ -1,7 +1,7 @@
 #!/bin/bash
 
 if [[ $# -lt 1 ]]; then
-	echo "Uso: ./comp.sh nome_do_arquivo \[nome_de_saida\]"
+	echo "Uso: ./comp.sh nome_do_arquivo [nome_do_executavel]"
 	exit
 fi
 
