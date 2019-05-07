@@ -4,7 +4,10 @@ comp.sh 		- Para facilitar a compilação dos projetos, argumentos: nome do arqu
 
 Devem ser implementadas as funções void loop() e void setup() e incluir o arquivo fx.cpp
 
-Para informar o número correto de linhas ou colunas, fazer a chamada de uma das funções
+Para informar o número correto de linhas ou colunas
+
+Na função setup() utilizar uma das alternativas:
+
 set_num_cols( cols )
 set_num_lines( lines )
 set_grid_dims( lines, cols )
