@@ -121,9 +121,7 @@ void seed_apple() {
 
 
 void change_direction() {
-	
-	//Debounce time
-	delay(0);
+
 	if(digitalRead(UP) == HIGH) {
 		dir = 'u';
 	} else if (digitalRead(DOWN) == HIGH) {
@@ -193,7 +191,16 @@ void move_snake(char c) {
 }
 
 void loop () {
-	if(button_pressed) change_direction();
+	//if(button_pressed) change_direction();
+	if(digitalRead(UP) == HIGH) {
+		dir = 'u';
+	} else if (digitalRead(DOWN) == HIGH) {
+		dir = 'd';
+	} else if (digitalRead(LEFT) == HIGH) {
+		dir = 'l';
+	} else if (digitalRead(RIGHT) == HIGH) {
+		dir = 'r';
+	}
 	if(dir != 's') move_snake(dir);
 	strip.show();
 	delay(100 - snake_size / 5);
