@@ -67,7 +67,7 @@ void httpd_update() {
 
 void httpd_handle_index() {
   // Reply.
-  server.send(200, "text/plain", "Hello world!");
+  server.send(200, "text/html", "<!DOCTYPE html><html xmlns=\"http://www.w3.org/1999/xhtml\"> <head> <meta charset=\"utf-8\"/> <meta http-equiv=\"X-UA-Compatible\" content=\"IE=edge\"/> <title>Startpage</title> <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"/> <link rel=\"stylesheet\" href=\"https://cdn.rawgit.com/necolas/normalize.css/8.0.0/normalize.css\"/> <link rel=\"stylesheet\" href=\"https://cdn.rawgit.com/milligram/milligram/v1.3.0/dist/milligram.min.css\"/> <link rel=\"stylesheet\" href=\"https://raw.githack.com/cacauvicosa/inf351_2019/master/Raphael/WiFi/site.css\"/> </head> <body> <input type=\"color\" id=\"picker\" value=\"#ff0000\"/> <div id=\"grid\"></div><script src=\"https://cdn.rawgit.com/WebReflection/hyperHTML/v2.13.0/min.js\"></script> <script src=\"https://raw.githack.com/cacauvicosa/inf351_2019/master/Raphael/WiFi/site.js\"></script> </body></html>")
 }
 
 void httpd_handle_update() {
