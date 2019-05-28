@@ -140,13 +140,16 @@ void rotate(block_shape_t *shape) {
   shape->cols = rows;
 }
 
-world_t buf = {.cols = TETRIS_COLS, .rows = TETRIS_ROWS};
+world_t buf;
 
 /// Checks if a block touches any other set tile directly below it.
 bool touches(const block_t *block, const world_t *world) {
-  memcpy(world->tiles, buf.tiles, sizeof world->tiles);
+  buf.cols = world->cols;
+  buf.rows = world->rows;
 
-  paste(block, buf);
+  memcpy(buf.tiles, world->tiles, sizeof world->tiles);
+
+  paste(block, &buf);
 
   for (byte y = 0; y < block->shape.rows; ++y)
     for (byte x = 0; x < block->shape.cols; ++x) {
@@ -221,7 +224,7 @@ void cleanup(world_t *world) {
 
 #include <Adafruit_NeoPixel.h>
 
-#define LED_PIN (8)
+#define LED_PIN (D3)
 
 #define ROWS (12)
 #define COLS (12)
@@ -248,7 +251,10 @@ void setup() {
   randomSeed(analogRead(0));
 
   block_t block;
-  world_t world = {.cols = TETRIS_COLS, .rows = TETRIS_ROWS};
+  world_t world;
+
+  world.cols = TETRIS_COLS;
+  world.rows = TETRIS_ROWS;
 
   new_block(&block, random(0, 7));
   new_world(&world);
@@ -276,6 +282,8 @@ void setup() {
     delay(MS_PER_TICK);
   }
 }
+
+void loop() {}
 
 bool move(block_t *block, byte input) {
   switch (input) {
