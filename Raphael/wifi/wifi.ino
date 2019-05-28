@@ -5,13 +5,13 @@
 #include <ESP8266WebServer.h>
 #include <ESP8266WiFi.h>
 
-#define LED_PIN (A0)
+#define LED_PIN (D1)
 
-#define ROWS (1)
-#define COLS (8)
+#define ROWS (12)
+#define COLS (12)
 
-#define SSID ("Arc")
-#define PASS ("4/6/6/2/20")
+#define SSID ("dpi-2")
+#define PASS ("Mjh4nNnReK")
 
 // WiFi {{{
 
@@ -30,13 +30,17 @@ void connect() {
 // LED helper {{{
 
 Adafruit_NeoPixel pixels =
-    Adafruit_NeoPixel(ROWS * COLS, LED_PIN, NEO_GRB + NEO_KHZ800);
+  Adafruit_NeoPixel(ROWS * COLS, LED_PIN, NEO_GRB + NEO_KHZ800);
 
 /// Sets up the LED strip.
-void leds_begin() { pixels.begin(); }
+void leds_begin() {
+  pixels.begin();
+}
 
 /// Sends the updates to the LED strip.
-void leds_flush() { pixels.show(); }
+void leds_flush() {
+  pixels.show();
+}
 
 /// Lights up a pixel.
 void leds_pixel(int x, int y, int r, int g, int b) {
@@ -67,7 +71,7 @@ void httpd_update() {
 
 void httpd_handle_index() {
   // Reply.
-  server.send(200, "text/html", "<!DOCTYPE html><html xmlns=\"http://www.w3.org/1999/xhtml\"> <head> <meta charset=\"utf-8\"/> <meta http-equiv=\"X-UA-Compatible\" content=\"IE=edge\"/> <title>Startpage</title> <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"/> <link rel=\"stylesheet\" href=\"https://cdn.rawgit.com/necolas/normalize.css/8.0.0/normalize.css\"/> <link rel=\"stylesheet\" href=\"https://cdn.rawgit.com/milligram/milligram/v1.3.0/dist/milligram.min.css\"/> <link rel=\"stylesheet\" href=\"https://raw.githack.com/cacauvicosa/inf351_2019/master/Raphael/WiFi/site.css\"/> </head> <body> <input type=\"color\" id=\"picker\" value=\"#ff0000\"/> <div id=\"grid\"></div><script src=\"https://cdn.rawgit.com/WebReflection/hyperHTML/v2.13.0/min.js\"></script> <script src=\"https://raw.githack.com/cacauvicosa/inf351_2019/master/Raphael/WiFi/site.js\"></script> </body></html>")
+  server.send(200, "text/html", "<!DOCTYPE html><html xmlns=\"http://www.w3.org/1999/xhtml\"> <head> <meta charset=\"utf-8\"/> <meta http-equiv=\"X-UA-Compatible\" content=\"IE=edge\"/> <title>Startpage</title> <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"/> <link rel=\"stylesheet\" href=\"https://cdn.rawgit.com/necolas/normalize.css/8.0.0/normalize.css\"/> <link rel=\"stylesheet\" href=\"https://cdn.rawgit.com/milligram/milligram/v1.3.0/dist/milligram.min.css\"/> <link rel=\"stylesheet\" href=\"https://raw.githack.com/cacauvicosa/inf351_2019/master/Raphael/WiFi/site.css\"/> </head> <body> <input type=\"color\" id=\"picker\" value=\"#ff0000\"/> <div id=\"grid\"></div><script src=\"https://cdn.rawgit.com/WebReflection/hyperHTML/v2.13.0/min.js\"></script> <script src=\"https://raw.githack.com/cacauvicosa/inf351_2019/master/Raphael/WiFi/site.js\"></script> </body></html>");
 }
 
 void httpd_handle_update() {
@@ -96,4 +100,6 @@ void setup() {
   httpd_begin();
 }
 
-void loop() { httpd_update(); }
+void loop() {
+  httpd_update();
+}
