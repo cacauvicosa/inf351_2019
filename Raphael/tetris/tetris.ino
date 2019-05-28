@@ -140,26 +140,28 @@ void rotate(block_shape_t *shape) {
   shape->cols = rows;
 }
 
+world_t buf = {.cols = TETRIS_COLS, .rows = TETRIS_ROWS};
+
 /// Checks if a block touches any other set tile directly below it.
 bool touches(const block_t *block, const world_t *world) {
-  // TODO: change to detect if current move is invalid, and, if so, backtrack.
-  for (byte y = 0; y < block->shape.rows; ++y) {
-    byte row = y + block->y;
+  memcpy(world->tiles, buf.tiles, sizeof world->tiles);
 
-    // Block touches the floor.
-    if (row == world->rows - 1)
-      return true;
+  paste(block, buf);
 
-    // Array offset to the first tile below the block.
-    byte below = (row + 1) * world->cols + block->x;
+  for (byte y = 0; y < block->shape.rows; ++y)
+    for (byte x = 0; x < block->shape.cols; ++x) {
+      byte wy = block->y + y;
+      byte wx = block->x + x;
 
-    // Array offset to the block row.
-    byte offset = y * block->shape.cols;
+      byte pos = wy * world->cols + wx;
 
-    for (byte x = 0; x < block->shape.cols; ++x)
-      if (block->shape.points[offset + x] && world->tiles[below + x].set)
+      // Block touches the floor.
+      if (wy == world->rows - 1)
         return true;
-  }
+
+      if (world->tiles[pos].set && buf.tiles[pos].set)
+        return true;
+    }
 
   return false;
 }
@@ -221,8 +223,8 @@ void cleanup(world_t *world) {
 
 #define LED_PIN (8)
 
-#define ROWS (6)
-#define COLS (6)
+#define ROWS (12)
+#define COLS (12)
 
 #define MS_PER_TICK (300)
 
@@ -246,7 +248,7 @@ void setup() {
   randomSeed(analogRead(0));
 
   block_t block;
-  world_t world = {.cols = 12, .rows = 12};
+  world_t world = {.cols = TETRIS_COLS, .rows = TETRIS_ROWS};
 
   new_block(&block, random(0, 7));
   new_world(&world);
