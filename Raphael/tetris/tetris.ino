@@ -140,29 +140,26 @@ void rotate(block_shape_t *shape) {
   shape->cols = rows;
 }
 
-world_t buf;
-
 /// Checks if a block touches any other set tile directly below it.
-bool touches(const block_t *block, const world_t *world) {
-  buf.cols = world->cols;
-  buf.rows = world->rows;
-
-  memcpy(buf.tiles, world->tiles, sizeof world->tiles);
-
-  paste(block, &buf);
-
+bool touches(const block_t *block, const world_t *world, const byte dx,
+             const byte dy) {
   for (byte y = 0; y < block->shape.rows; ++y)
     for (byte x = 0; x < block->shape.cols; ++x) {
-      byte wy = block->y + y;
-      byte wx = block->x + x;
+      byte wy = block->y + y + dy;
+      byte wx = block->x + x + dx;
 
-      byte pos = wy * world->cols + wx;
+      byte block_pos = y * block->shape.cols + x;
+      byte world_pos = wy * world->cols + wx;
 
       // Block touches the floor.
-      if (wy == world->rows - 1)
+      if (wy >= world->rows)
         return true;
 
-      if (world->tiles[pos].set && buf.tiles[pos].set)
+      // Block touches the walls.
+      if (wx >= world->cols || wx < 0)
+        return true;
+
+      if (world->tiles[world_pos].set && block->shape.points[block_pos])
         return true;
     }
 
@@ -231,6 +228,11 @@ void cleanup(world_t *world) {
 
 #define MS_PER_TICK (300)
 
+#define UP (D8)
+#define DOWN (D7)
+#define LEFT (D6)
+#define RIGHT (D5)
+
 Adafruit_NeoPixel pixels =
     Adafruit_NeoPixel(ROWS * COLS, LED_PIN, NEO_GRB + NEO_KHZ800);
 
@@ -247,6 +249,13 @@ void set_pixel(int x, int y, int r, int g, int b) {
 // }}}
 
 void setup() {
+  Serial.begin(9600);
+
+  pinMode(UP, INPUT);
+  pinMode(DOWN, INPUT);
+  pinMode(LEFT, INPUT);
+  pinMode(RIGHT, INPUT);
+
   pixels.begin();
   randomSeed(analogRead(0));
 
@@ -262,14 +271,28 @@ void setup() {
   byte input;
 
   while (true) {
+    if (block.y == 0 && touches(&block, &world, 0, 0)) {
+      new_block(&block, random(0, 7));
+      new_world(&world);
+    }
+
     // Simulate random input.
-    input = random(65, 71);
+    input = random(65, 69);
 
-    if (move(&block, input) == false)
-      // Move down.
-      move(&block, 66);
+    if (digitalRead(UP))
+      input = 65;
+    else if (digitalRead(DOWN))
+      input = 66;
+    else if (digitalRead(LEFT))
+      input = 68;
+    else if (digitalRead(RIGHT))
+      input = 67;
+    else
+      input = 66;
 
-    if (touches(&block, &world)) {
+    move(&block, &world, input);
+
+    if (touches(&block, &world, 0, 1)) {
       paste(&block, &world);
       new_block(&block, random(0, 7));
     }
@@ -285,29 +308,38 @@ void setup() {
 
 void loop() {}
 
-bool move(block_t *block, byte input) {
+bool move(block_t *block, world_t *world, byte input) {
   switch (input) {
   case 65:
     rotate(&block->shape);
-    return true;
+    if (touches(block, world, 0, 0) == false)
+      return true;
+    else {
+      rotate(&block->shape);
+      rotate(&block->shape);
+      rotate(&block->shape);
+    }
 
   case 66:
-    block->y += 1;
-    return true;
+    if (touches(block, world, 0, 1) == false) {
+      block->y += 1;
+      return true;
+    }
 
   case 68:
-    if (block->x > 0)
+    if (touches(block, world, -1, 0) == false) {
       block->x -= 1;
-    return true;
+      return true;
+    }
 
   case 67:
-    if (block->x + block->shape.cols < 12)
+    if (touches(block, world, 1, 0) == false) {
       block->x += 1;
-    return true;
-
-  default:
-    return false;
+      return true;
+    }
   }
+
+  return false;
 }
 
 /// Draws the game state.
